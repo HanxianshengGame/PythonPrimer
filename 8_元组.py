@@ -15,6 +15,7 @@
 
 first_tuple = ()  # 空元组
 first_tuple = ("python",) # 单个元素的元组
+
 print(id(first_tuple))
 first_tuple = ("abcd", 89, 9.33, "peter", [11, 22, 33])
 print(id(first_tuple))  # 由于元组并不支持修改，所以重新赋值元组则重新开辟新地址

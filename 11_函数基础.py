@@ -114,7 +114,7 @@ def complexFunc(*args, **kwargs):
 
 
 complexFunc(1, 2, **first_dict)
-print(first_dict)  # 传的first_dict是值类型
+print(first_dict)  
 
 
 # 5. 函数返回值
