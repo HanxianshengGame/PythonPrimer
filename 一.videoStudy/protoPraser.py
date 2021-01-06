@@ -119,7 +119,7 @@ class ProtoParser(object):
     @staticmethod
     def DataUnpack(placeholder_ch, byte_buffer):
         s = struct.Struct("<" + placeholder_ch)
-        return s.unpack(byte_buffer)
+        return s.unpack(byte_buffer)[0]
 
     @classmethod
     def __buildDescCore(cls, proto_content):
@@ -247,17 +247,74 @@ class ProtoParser(object):
 
     ## ================反序列化================
 
-    def __loadsLen(self):
-        pass
-    def __loadsSimpleType(self):
-        pass
-    def __loadsCore(self):
-        pass
+# 双倍取值问题
+    def __loadsLen(self, data_str):
+        len_info = self.type_dict["uint16"]
+        len_data_str_len = len_info[0] * 2
+        len_data_str = data_str[0:len_data_str_len:]
+        result_data_str = data_str[len_data_str_len::]
+        result_len = self.DataUnpack(len_info[1], binascii.unhexlify(len_data_str.encode(encoding="utf-8")))
+        return result_len, result_data_str
 
-    def loads(self, s):
+    def __loadsSimpleType(self, var_name, data_str, proto_dict):
+        var_info = proto_dict[var_name]
+        var_type_info = self.type_dict[var_info[0]]
+        content_len = var_type_info[0] * 2
+        placeholder_ch = var_type_info[1]
+        if content_len == -1 * 2:  # 字符串         # TODO 2 倍的一个 取字符串长度
+            result = self.__loadsLen(data_str)
+            content_len = result[0] * 2
+            data_str = result[1]
+            placeholder_ch = str(result[0]) + placeholder_ch
+
+        content_data_str = data_str[0:content_len:]
+        result_data_str = data_str[content_len::]
+        content_data = content_data_str.encode(encoding="utf-8")
+
+        result_content = self.DataUnpack(placeholder_ch,
+                                         binascii.unhexlify(content_data))
+        if var_info[0] == "string":
+            result_content = result_content.decode(encoding="utf-8")
+
+        return result_content, result_data_str
+
+    def __loadsCore(self, data_str, proto_dict):
         result_dict = {}
+        for var_name, var_info in proto_dict.items():
+            var_count = var_info[1]
+            if var_count > 1 or var_count == -1:  # 定长数组 与非定长数组
+                if var_count == -1:
+                    result = self.__loadsLen(data_str)
+                    var_count = result[0]
+                    data_str = result[1]
+                    pass
+                result_dict[var_name] = []
+                while var_count:
+                    pass
+                    if type(var_info[0]) == dict:
+                        result_dict[var_name].append(self.__loadsCore(data_str, proto_dict[var_name][0]))
+                    else:
+                        result = self.__loadsSimpleType(var_name, data_str, proto_dict)
+                        result_dict[var_name].append(result[0])
+                        data_str = result[1]
+                    var_count -= 1
+                    pass
+                    result_dict[var_name] = tuple(result_dict[var_name])
+                pass
+
+            elif type(var_info[0]) == dict:  # 嵌套字典类型
+                result_dict[var_name] = self.__loadsCore(data_str, proto_dict[var_name][0])
+                pass
+            else:  # 基本类型（string 与其他）
+                result = self.__loadsSimpleType(var_name, data_str, proto_dict)
+                result_dict[var_name] = result[0]
+                data_str = result[1]
+                pass
 
         return result_dict
+
+    def loads(self, s):
+        return self.__loadsCore(s, self.proto_dict)
         pass
 
     ## ================压缩================
@@ -292,3 +349,5 @@ obj = {
 
 serialize_str = parser.dumps(obj)
 print(serialize_str)
+result_dict = parser.loads(serialize_str)
+print(result_dict)

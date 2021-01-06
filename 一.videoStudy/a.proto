@@ -1,0 +1,19 @@
+{
+string name           ; int32 id     ;
+
+
+
+
+
+
+    uint16    level;
+{
+int32 id;
+    string name;
+    }[]  pet;
+
+    int16[2] x;
+string[]skill;
+
+
+    }

@@ -254,21 +254,21 @@ class Base(object):
         print("我喜欢吃面条")
         pass
 
-
-class Drived(Base):
-    def __init__(self, name, color):
-        super().__init__(name, color)  # super() 自动找父类的(按搜索顺序)，进而调用方法
-        self.height = 90
-        self.weight = 20
-
-    def eat(self):
-        super().eat()
-        print("我喜欢吃素")
-        pass
-
-
-derived = Drived("hzj", "蓝")
-derived.eat()
+#
+# class Drived(Base):
+#     def __init__(self, name, color):
+#         super().__init__(name, color)  # super() 自动找父类的(按搜索顺序)，进而调用方法
+#         self.height = 90
+#         self.weight = 20
+#
+#     def eat(self):
+#         super().eat()
+#         print("我喜欢吃素")
+#         pass
+#
+#
+# derived = Drived("hzj", "蓝")
+# derived.eat()
 
 
 # 10. 多态

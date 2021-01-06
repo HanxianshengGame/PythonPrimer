@@ -25,8 +25,8 @@ print(temp_str)
 
 temp_str = r"\n"  # 在字符串前加 r 可以防止转义
 
-for item in one_str:
-    print(item, end=" ")
+# for item in one_str:
+#     print(item, end=" ")
 
 print()
 
