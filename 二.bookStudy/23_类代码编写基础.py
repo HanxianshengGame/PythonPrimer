@@ -5,3 +5,19 @@
 # @Time     : 2021/1/6 18:56
 # @Software : PyCharm
 # @Introduce: This is
+
+class ThirdClass:
+    def __init__(self, val):
+        self.data = val
+        pass
+
+    def __add__(self, other):
+        return ThirdClass(self.data + other.data)
+
+    def __str__(self):
+        return str(self.data)
+
+
+obj1 = ThirdClass(1)
+obj2 = ThirdClass(2)
+print obj1 + obj2
